@@ -163,15 +163,18 @@ public class StandardProtocol<T> implements ProtocolProcessor {
     }
 
     @Override
+    // client处理response
     public void processResponse(RPCClient rpcClient, Object object) throws Exception {
         RPCMessage<RPCHeader.ResponseHeader> fullResponse = (RPCMessage<RPCHeader.ResponseHeader>) object;
+        // response是有一个对应的client的Id的
         Long callId = fullResponse.getHeader().getCallId();
+        // 找到对应Id的future
         RPCFuture future = rpcClient.getRPCFuture(callId);
         if (future == null) {
             return;
         }
         rpcClient.removeRPCFuture(callId);
-
+        // 根据返回的内容处理对应的future
         if (fullResponse.getHeader().getResCode() == RPCHeader.ResCode.RES_SUCCESS) {
             Method decodeMethod = future.getResponseClass().getMethod("parseFrom", byte[].class);
             MessageLite responseBody = (MessageLite) decodeMethod.invoke(

@@ -9,9 +9,11 @@ public class RPCServerTest {
         if (args.length == 1) {
             port = Integer.valueOf(args[0]);
         }
-
+        // Create a RPC Server
         RPCServer rpcServer = new RPCServer(port);
+        // register a service
         rpcServer.registerService(new SampleServiceImpl());
+        // start up the service
         rpcServer.start();
 
         // make server keep running

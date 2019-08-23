@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 
 /**
  * Created by wenweihu86 on 2017/4/25.
+ *
+ * 注册一个service
  */
 public class ServiceInfo {
 

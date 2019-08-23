@@ -14,6 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by wenweihu86 on 2017/4/25.
+ *
+ * 工作的线程池
+ * 1. executor java原生线程池对象
+ * 2. 任务的阻塞队列
  */
 public class WorkThreadPool {
 
@@ -36,6 +40,10 @@ public class WorkThreadPool {
     }
 
     public static class WorkTask implements Runnable {
+        /**
+         * work task
+         * 一个work 需要进行处理的内容，或者工作的内容
+         */
         private Object fullRequest;
         private ChannelHandlerContext ctx;
 
@@ -47,8 +55,11 @@ public class WorkThreadPool {
 
         @Override
         public void run() {
+            // 协议的内容
             ProtocolProcessor protocol = StandardProtocol.instance();
+            // 处理协议
             Object fullResponse = protocol.processRequest(fullRequest);
+            // 获得结果，结果写入到对应的context中
             ctx.channel().writeAndFlush(fullResponse);
         }
 

@@ -21,7 +21,12 @@ public class RPCServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx,
                              Object request) throws Exception {
+        // work pool 中的task
+        // task的输入为一个request
+        // task的输出为一个response
         WorkThreadPool.WorkTask task = new WorkThreadPool.WorkTask(ctx, request);
+        // 获得对应work pool的executor
+        // 对executor提交任务
         rpcServer.getWorkThreadPool().getExecutor().submit(task);
     }
 

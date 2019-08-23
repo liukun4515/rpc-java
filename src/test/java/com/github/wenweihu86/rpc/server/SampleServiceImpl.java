@@ -10,6 +10,7 @@ public class SampleServiceImpl implements SampleService {
 
     @Override
     public Sample.SampleResponse sampleRPC(Sample.SampleRequest request) {
+        // RPC的操作就是A+B 返回C的内容
         String c = request.getB() + request.getA();
         Sample.SampleResponse response = Sample.SampleResponse.newBuilder()
                 .setC(c).build();

@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
 public class RPCProxy implements MethodInterceptor {
 
     private static final Logger LOG = LoggerFactory.getLogger(RPCProxy.class);
-
+    // 客户端的代理
     private RPCClient rpcClient;
 
     public RPCProxy(RPCClient rpcClient) {
         this.rpcClient = rpcClient;
     }
-
+    // 获得一个客户端的代理
     public static <T> T getProxy(RPCClient rpcClient, Class clazz) {
         Enhancer en = new Enhancer();
         en.setSuperclass(clazz);

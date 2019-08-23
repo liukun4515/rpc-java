@@ -29,8 +29,10 @@ public class RPCClient {
 
     private RPCClientOptions rpcClientOptions;
     private Bootstrap bootstrap;
+    // 管理当前client负责的RPC请求
     private ConcurrentMap<Long, RPCFuture> pendingRPC;
     private ScheduledExecutorService timeoutTimer;
+    // 管理RPC的终端
     private CopyOnWriteArrayList<EndPoint> endPoints;
     private CopyOnWriteArrayList<RPCChannelGroup> allConnections;
 
@@ -79,19 +81,30 @@ public class RPCClient {
             timeoutTimer.shutdown();
         }
     }
-
+    // 通过RPC client 发送一个Request
+    // 调用RPC Client 发送一个Request
+    // 方法是异步的，会返回一个Future
+    // 这个Future控制着整个结果
+    // 通过对Future内容结果的set和put，以及同步完成操作
     public <T> Future<T> sendRequest(
             final Long callId, Object fullRequest,
             Class<T> responseClass, RPCCallback<T> callback) {
+        // 从所有的connect中按照一定的策略找到一个channel
         RPCChannelGroup.ChannelInfo channelInfo = RandomStrategy.instance().selectChannel(allConnections);
         if (channelInfo == null || channelInfo.getChannel() == null || !channelInfo.getChannel().isActive()) {
             return null;
         }
+        // 把request封装成一个Future进行处理
         // add request to RPCFuture and add timeout task
         final long readTimeout = getRPCClientOptions().getReadTimeoutMillis();
+        // 提交给定时任务处理器
+        // 超时以后需要进行time out的处理
         ScheduledFuture scheduledFuture = timeoutTimer.schedule(new Runnable() {
+            // 定时的任务remove 对应的future
+            // 超过时间定时运行，去除future
             @Override
             public void run() {
+                // remove，有可能获得future不正确
                 RPCFuture rpcFuture = removeRPCFuture(callId);
                 if (rpcFuture != null) {
                     LOG.debug("request timeout, callId={}", callId);
@@ -99,9 +112,12 @@ public class RPCClient {
                 }
             }
         }, readTimeout, TimeUnit.MILLISECONDS);
+        // 封装对应的请求到Future中
         RPCFuture future = new RPCFuture(scheduledFuture, callId, fullRequest,
                 responseClass, callback, channelInfo.getChannelGroup());
         addRPCFuture(callId, future);
+        // channel 发送request的内容
+        // 把request进行发送
         channelInfo.getChannel().writeAndFlush(fullRequest);
         return future;
     }

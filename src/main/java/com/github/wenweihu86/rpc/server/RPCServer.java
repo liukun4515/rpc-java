@@ -45,9 +45,11 @@ public class RPCServer {
     private EventLoopGroup workerGroup;
 
     // business handler thread pool
+    // 业务逻辑 pool
     private WorkThreadPool workThreadPool;
 
     public RPCServer(int port) {
+        // default RPC Server Option
         this(port, new RPCServerOptions());
     }
 
@@ -118,6 +120,7 @@ public class RPCServer {
         Class clazz = interfaces[0];
         Method[] methods = clazz.getDeclaredMethods();
         ServiceManager serviceManager = ServiceManager.getInstance();
+        // 把不同的method注册到 service manager中
         for (Method method : methods) {
             ServiceInfo serviceInfo = new ServiceInfo();
 

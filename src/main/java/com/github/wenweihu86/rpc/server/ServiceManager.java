@@ -8,6 +8,8 @@ import java.util.Map;
 
 /**
  * Created by wenweihu86 on 2017/4/25.
+ *
+ * 管理 service
  */
 public class ServiceManager {
 

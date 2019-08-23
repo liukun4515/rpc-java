@@ -19,8 +19,11 @@ public class RPCClientHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     @Override
+    // client handler的任务就是
+    // 处理请求和以及对应的client
     public void channelRead0(ChannelHandlerContext ctx, Object fullResponse) throws Exception {
         ProtocolProcessor protocol = StandardProtocol.instance();
+        // client获得response的内容进行处理
         protocol.processResponse(rpcClient, fullResponse);
     }
 

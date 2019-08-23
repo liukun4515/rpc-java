@@ -55,10 +55,12 @@ public class RPCChannelGroup {
         this.locks = new ReentrantLock[connectionNum];
         for (int i = 0; i < connectionNum; i++) {
             this.locks[i] = new ReentrantLock();
+            // 初始化的时候建立n个链接
+            // 每一个链接有一个lock
             this.channelFutures[i] = connect(ip, port);
         }
     }
-
+    // 获得一个有效的channel
     public Channel getChannel(int index) {
         Validate.isTrue(index >=0 && index < connectionNum);
         if (isChannelValid(channelFutures[index])) {
@@ -97,7 +99,8 @@ public class RPCChannelGroup {
             }
         }
     }
-
+    // 某个ip 简历链接
+    // 返回的是一个future
     private ChannelFuture connect(final String ip, final int port) {
         ChannelFuture future = bootstrap.connect(new InetSocketAddress(ip, port));
         future.addListener(new ChannelFutureListener() {
@@ -114,7 +117,7 @@ public class RPCChannelGroup {
         });
         return future;
     }
-
+    // 验证Future已经可以使用
     private boolean isChannelValid(ChannelFuture channelFuture) {
         if (channelFuture != null && channelFuture.isSuccess()) {
             Channel channel = channelFuture.channel();
